@@ -24,17 +24,44 @@
         <textarea id="json-textarea" class="form-control"></textarea>
         <span class="help-block"</span>
       </div>
-      <div class="form-group">
-        <button type="submit" id="json-submit" class="btn btn-default">Submit</button>
+      <div class="form-group btn-flex">
+        <a id="clear-form" class="btn btn-warning">Clear</a>
+        <div class="pull-left btn btn-default" id="load-sample">Sample Data</div>
+        <button type="submit" id="json-submit" class="btn btn-info">Submit</button>
       </div>
     </form>
   </section>
 </div>
 
-<div class="container">
-  <input type="button" value="select table" class="btn btn-info pull-right" onclick="selectElementContents( document.getElementById('csv-test') );">
-  <table id="csv-test" class="table table-bordered"></table>
+<div class="container show-csv">
+  <div class="clearfix">
+    <input type="button" value="select table" class="btn btn-sm btn-default pull-right"
+      onclick="selectElementContents( document.getElementById('csv-table') );">
+  </div>
+  <br>
+  <div id="csv-table"></div>
 </div>
+
+<script type="text/template" id="csv-table-template">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <% categories.forEach(cat => { %>
+        <td><%- cat %></td>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% locs.forEach(loc => { %>
+        <tr>
+          <% for(let prop in loc){ %>
+            <td><%- loc[prop] %></td>
+          <% } %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</script>
 
 </body>
 </html>
