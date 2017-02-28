@@ -9,12 +9,20 @@ $(document).ready(function () {
     if (!value && !isJSON(value.toString())) {
       $('#json-form .form-group').addClass('has-error');
       $('#json-form .help-block').html('Invalid JSON');
+
+
+
     }
     else {
       $('#json-form .form-group').removeClass('has-error');
       $('#json-form .help-block').html('');
 
-      generateTable(JSON.parse(value));
+      // generateTable(JSON.parse(value));
+      // getGeoLocations();
+      // getGeoLocations(JSON.parse(value));
+
+      let rawLocations = fetchLocation(JSON.parse(value));
+      getGeoLocations(rawLocations);
     }
 
   });
@@ -29,19 +37,67 @@ $(document).ready(function () {
     $('#json-textarea').val(JSON.stringify(sampleLocations));
   });
 
+
+
+
+  // test location
+  let adr = "301 - 754 Broughton Street, Victoria British Columbia Canada V8W1E1";
+  let geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ 'address': ["301 - 754 Broughton Street, Victoria British Columbia Canada V8W1E1", "9915-108A Ave., Edmonton Alberta Canada T5H4L6"] }, function (results, status) {
+    console.log('status', status);
+    console.log('results', results[0].geometry.location.lat());
+
+  });
 });
 
 
+function getGeoLocations(locations) {
+  // Heading
+  let categories = defaultCategories();
+  let headTemplate = $('#csv-head-row-template').html();
+  let headCompiled = _.template(headTemplate)({ categories });
+  $('#csv-head-row').html(headCompiled);
+
+
+  // Body
+  let geoLocs = locations.map((loc) => {
+    let locs = Object.assign({}, loc);
+    let geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'address': loc.Address }, function (results, status) {
+      if (status === 'OK') {
+        locs.Latitude = results[0].geometry.location.lat();
+        locs.Longitude = results[0].geometry.location.lng();
+      } else {
+        console.log(status);
+        console.log(`${loc.Address} has a problem`);
+        locs.Latitude ='';
+        locs.Longitude = '';
+      }
+
+      // console.log(locs);
+      let template = $('#csv-body-row-template').html();
+      let compiled = _.template(template)({locs});
+      $('#csv-body-row').append(compiled);
+
+    });
+  });
+}
+
+
 function defaultCategories() {
-  let categories = ['Address', 'StorePhoneNumbers', 'Name', 'Id'];
+  let categories = ['Address', 'StorePhoneNumbers', 'Name', 'Id', 'Latitude', 'Longitude'];
   return categories;
 }
+
+
 
 function fetchLocation(locations, categories) {
   categories = categories || defaultCategories();
 
   return locations.map(location => {
     let {AddressLine1, City, StateName, CountryName, Zip} = location.Address;
+
+    let concatAddress = `${AddressLine1}, ${City} ${StateName} ${CountryName} ${Zip}`;
 
     return categories.reduce((prev, cat) => {
       if (cat === 'Address') {
@@ -55,14 +111,13 @@ function fetchLocation(locations, categories) {
       }
       return prev;
     }, {});
-
   });
 }
 
 function generateTable(locations) {
   let categories = defaultCategories();
   let locs = fetchLocation(locations);
-
+  console.log(locs);
   let template = $('#csv-table-template').html();
   let compiled = _.template(template)({
     categories,

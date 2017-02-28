@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script async defer type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCsf1yq_JUSyz9zEDWwFTP5IkP1-xg7wFw"></script>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="styles.css" />
   <script
@@ -39,7 +40,16 @@
       onclick="selectElementContents( document.getElementById('csv-table') );">
   </div>
   <br>
-  <div id="csv-table"></div>
+  <!--<div id="csv-table"></div>-->
+
+
+
+  <div id="csv-row">
+    <table class="table table-bordered">
+      <thead id="csv-head-row"></thead>
+      <tbody id="csv-body-row"></tbody>
+    </table>
+  </div>
 </div>
 
 <script type="text/template" id="csv-table-template">
@@ -62,6 +72,32 @@
     </tbody>
   </table>
 </script>
+
+
+
+<div id="csv-row">
+  <table class="table table-bordered">
+    <thead id="csv-head-row"></thead>
+    <tbody id="csv-body-row"></tbody>
+  </table>
+</div>
+
+<script type="text/template" id="csv-body-row-template">
+  <tr>
+  <% for(let prop in locs){ %>
+    <td><%- locs[prop] %></td>
+  <% } %>
+  </tr>
+</script>
+
+<script type="text/template" id="csv-head-row-template">
+  <tr>
+  <% categories.forEach(cat => { %>
+  <td><%- cat %></td>
+  <% }) %>
+  </tr>
+</script>
+
 
 </body>
 </html>
